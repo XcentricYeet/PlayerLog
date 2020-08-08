@@ -15,9 +15,10 @@ public class PlayerLog2 {
         String serverName = "";
         boolean notifications = true;
         ArrayList<String> playerLinks = new ArrayList<>();
+        ArrayList<Integer> playerFileNum = new ArrayList<>();
 
         //collects the number of players
-        System.out.println("How many people do you want to keep tabs on?");
+        System.out.print("How many people do you want to keep tabs on?");
         tabsNum = scan.nextInt();
         scan.nextLine();
 
@@ -37,10 +38,13 @@ public class PlayerLog2 {
         for(int i=0; i < tabsNum; i++) {
             System.out.print("Paste the BattleMetrics link for " + playerNames.get(i) + ": ");
             playerLinks.add(scan.nextLine());
+            webPageDownload(playerLinks.get(i));
+            playerFileNum.add(i+1);
         }
+
         //makes an ArrayList filled with Player variables given the names from earlier
         for(int i=0; i < playerNames.size(); i++) {
-            Player2 temp = new Player2(playerNames.get(i), playerLinks.get(i));
+            Player2 temp = new Player2(playerNames.get(i), playerLinks.get(i), playerFileNum.get(i));
             players.add(temp);
         }
 
@@ -52,12 +56,12 @@ public class PlayerLog2 {
         //checks for commands until the user quits
         while(true) {
             String command = scan.nextLine(); //collects user's command
-            Player2 cmdPlayer = new Player2("", ""); //player possibly used in command
+            Player2 cmdPlayer = new Player2("", "", 0); //player possibly used in command
 
             //checks to make sure that a player possibly in the command is an actual available player
             for (Player2 player : players) { //
                 if (command.contains(player.getName())) {
-                    cmdPlayer = new Player2(player.getName(), player.getLink());
+                    cmdPlayer = new Player2(player.getName(), player.getLink(), player.getFileNum());
                 }
             }
 
@@ -104,8 +108,6 @@ public class PlayerLog2 {
                 System.out.println("Unknown command");
             }
         }
-
-        //-=-=-=-=-=-=-=-=-=-=-=-   TESTING AREA    -=-=-=-=-=-=-=-=-=-=-=-
     }
 
     public static void webPageDownload(String link) throws IOException {
