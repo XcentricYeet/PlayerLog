@@ -1,16 +1,20 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Player3 {
     private String name;
     private String link;
+    private boolean notificationsToggle;
 
-    public Player3(String name, String link) {
+    public Player3(String name, String link, boolean notificationsToggle) {
         setName(name);
         setLink(link);
+        setNotificationsToggle(notificationsToggle);
     }
 
     public String getName() {
@@ -24,6 +28,12 @@ public class Player3 {
     }
     public void setLink(String link) {
         this.link = link;
+    }
+    public boolean isNotificationsToggle() {
+        return notificationsToggle;
+    }
+    public void setNotificationsToggle(boolean notificationsToggle) {
+        this.notificationsToggle = notificationsToggle;
     }
 
     public boolean isOnline() throws IOException {
@@ -62,5 +72,27 @@ public class Player3 {
             return Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":") - 2, sneakyBullshit.indexOf(":"))) * 60 + Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":") + 1,
                     sneakyBullshit.indexOf(":") + 3));
         } return 0;
+    }
+
+    public void notifications() throws IOException {
+        boolean originalStatus = isOnline();
+        Runnable notifRunnable = new Runnable() {
+            public void run() {
+                try {
+                    if(originalStatus != isOnline()) {
+                        if(originalStatus) {
+                            System.out.println(name + " has gone offline!");
+                        } else {
+                            System.out.println(name + " has gone online!");
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+        exec.scheduleAtFixedRate(notifRunnable, 0, 1, TimeUnit.MINUTES);
     }
 }
