@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 //import java.net.MalformedURLException;
 public class PlayerLog2 {
-    private static int fileCount = 1;
+    private static int fileCount;
     public static void main(String[] args) throws IOException {
         //variables
         Scanner scan = new Scanner(System.in);
@@ -15,10 +15,9 @@ public class PlayerLog2 {
         String serverName = "";
         boolean notifications = true;
         ArrayList<String> playerLinks = new ArrayList<>();
-        ArrayList<Integer> playerFileNum = new ArrayList<>();
 
         //collects the number of players
-        System.out.print("How many people do you want to keep tabs on?");
+        System.out.print("How many people do you want to keep tabs on? ");
         tabsNum = scan.nextInt();
         scan.nextLine();
 
@@ -38,13 +37,11 @@ public class PlayerLog2 {
         for(int i=0; i < tabsNum; i++) {
             System.out.print("Paste the BattleMetrics link for " + playerNames.get(i) + ": ");
             playerLinks.add(scan.nextLine());
-            webPageDownload(playerLinks.get(i));
-            playerFileNum.add(i+1);
         }
 
         //makes an ArrayList filled with Player variables given the names from earlier
         for(int i=0; i < playerNames.size(); i++) {
-            Player2 temp = new Player2(playerNames.get(i), playerLinks.get(i), playerFileNum.get(i));
+            Player2 temp = new Player2(playerNames.get(i), playerLinks.get(i));
             players.add(temp);
         }
 
@@ -56,12 +53,12 @@ public class PlayerLog2 {
         //checks for commands until the user quits
         while(true) {
             String command = scan.nextLine(); //collects user's command
-            Player2 cmdPlayer = new Player2("", "", 0); //player possibly used in command
+            Player2 cmdPlayer = new Player2("", ""); //player possibly used in command
 
             //checks to make sure that a player possibly in the command is an actual available player
             for (Player2 player : players) { //
                 if (command.contains(player.getName())) {
-                    cmdPlayer = new Player2(player.getName(), player.getLink(), player.getFileNum());
+                    cmdPlayer = new Player2(player.getName(), player.getLink());
                 }
             }
 
@@ -113,8 +110,8 @@ public class PlayerLog2 {
     public static void webPageDownload(String link) throws IOException {
         URL url = new URL(link);
         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-        BufferedWriter writer = new BufferedWriter(new FileWriter("Download" + fileCount + ".html"));
-        fileCount++;
+        BufferedWriter writer = new BufferedWriter(new FileWriter("Download" + getFileCount() + ".html"));
+        incFileCount();
         String line = "";
         while((line = reader.readLine()) != null) {
             writer.write(line);
@@ -122,10 +119,13 @@ public class PlayerLog2 {
 
         reader.close();
         writer.close();
-        System.out.println("Downloaded"); //delete
     }
 
     public static int getFileCount() {
         return fileCount;
+    }
+
+    public static void incFileCount() {
+        fileCount++;
     }
 }
