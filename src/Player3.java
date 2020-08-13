@@ -51,7 +51,7 @@ public class Player3 {
         return !serverList.contains("Not online");
     }
 
-    public int lastSeen() throws IOException {
+    public String lastSeen() throws IOException { //only works within the day which is super cringe
         PlayerLog3.webPageDownloader(name, link);
         File serverFile = new File(name + ".txt");
         Scanner readr = new Scanner(serverFile);
@@ -63,15 +63,12 @@ public class Player3 {
             serverList = temp;
         }
         readr.close();
-
         if(serverList.contains("Last Seen</dt><dd><time dateTime=")) {
             //gets time that the player logged off
-            String sneakyBullshit = serverList.substring(serverList.indexOf("Last Seen</dt><dd><time dateTime="), serverList.indexOf("title", serverList.indexOf("Last Seen</dt><dd><time dateTime=")));
 
             //converts time into number of minutes
-            return Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":") - 2, sneakyBullshit.indexOf(":"))) * 60 + Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":") + 1,
-                    sneakyBullshit.indexOf(":") + 3));
-        } return 0;
+            return serverList.substring(serverList.indexOf("Last Seen</dt><dd><time dateTime="), serverList.indexOf("title", serverList.indexOf("Last Seen</dt><dd><time dateTime=")));
+        } return "";
     }
 
     public void notifications() throws IOException {

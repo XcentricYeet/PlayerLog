@@ -38,17 +38,50 @@ public class LastSeenTest {
 
             //gets time that the player logged off
             String sneakyBullshit = serverList.substring(serverList.indexOf("Last Seen</dt><dd><time dateTime="), serverList.indexOf("title", serverList.indexOf("Last Seen</dt><dd><time dateTime=")));
+            System.out.println(sneakyBullshit);
 
-            //converts time into number of minutes
-            int currentTimeInMin = c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(java.util.Calendar.MINUTE); //Battlemetrics time
-            int logTimeInMin = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":")-2, sneakyBullshit.indexOf(":"))) * 60 + Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":")+1,
-                    sneakyBullshit.indexOf(":")+3));
-            System.out.println("Current: " + currentTimeInMin);
-            System.out.println("Log: " + logTimeInMin);
+            int logMonth = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf("-") + 1, sneakyBullshit.indexOf("-") + 3));
+            int logDay = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.lastIndexOf("-") + 1, sneakyBullshit.lastIndexOf("-") + 3));
+            int logHour = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.lastIndexOf("T") + 1, sneakyBullshit.indexOf(":")));
+            int logMinute = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":") + 1, sneakyBullshit.lastIndexOf(":")));
+            int logSecond = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.lastIndexOf(":") + 1, sneakyBullshit.lastIndexOf(":") + 3));
 
-            //subtracts logTimeInMin from currentTimeInMin to find out how long the player was last online
-            int timeOffline = currentTimeInMin - logTimeInMin;
-            System.out.println(name + " got offline " + timeOffline/60 + " hours and " + timeOffline%60 + " minutes ago");
+            int currentMonth = c.get(Calendar.MONTH) + 1;
+            int currentDay = c.get(Calendar.DAY_OF_MONTH);
+            int currentHour = c.get(Calendar.HOUR_OF_DAY);
+            int currentMinute = c.get(Calendar.MINUTE);
+            int currentSecond = c.get(Calendar.SECOND);
+
+            System.out.println();
+            System.out.println("Log time:");
+            System.out.println("month : day : hour : minute : second");
+            System.out.println(logMonth + " : " + logDay + " : " + logHour + " : " + logMinute + " : " + logSecond);
+
+            System.out.println();
+            System.out.println("Current time:");
+            System.out.println("month : day : hour : minute : second");
+            System.out.println(currentMonth + " : " + currentDay + " : " + currentHour + " : " + currentMinute + " : " + currentSecond);
+
+            System.out.println();
+
+            if(logMonth==currentMonth) {
+                int logSec = logDay * 86400 + logHour * 3600 + logMinute * 60 + logSecond;
+                int currentSec = currentDay * 86400 + currentHour * 3600 + currentMinute * 60 + currentSecond;
+                int difference = currentSec - logSec;
+                if(difference > 86400) {
+                    System.out.println(name + " logged out " + (difference/86400) + " days " + ((difference%86400)/3600) + " hours " + (((difference%86400)%3600)/60) + " minutes and " + (((difference%86400)%3600)%60) +
+                            " seconds ago");
+                } else if (86400 > difference && difference > 3600) {
+                    System.out.println(name + " logged out " + (difference/3600) + " hours " + ((difference%3600)/60) + " minutes and " + ((difference%3600)%60) + " seconds ago");
+                } else if (3600 > difference && difference > 60) {
+                    System.out.println(name + " logged out "  + (difference/60) + " minutes and" + (difference%60) + " seconds ago");
+                } else {
+                    System.out.println(name + " logged out "  + difference + " seconds ago");
+                }
+
+            } else {
+                System.out.println("Player has not logged on this month");
+            }
         }
 
         else if (serverList.contains("Last Seen</dt><dd>now")) {

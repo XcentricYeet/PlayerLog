@@ -6,7 +6,7 @@ current goals:
     - create boolean variable and have commands that turn on/off notifications for both specific players and every player: done
     - have it check to see if a specific player is online or not every minute, and to say "<playerName> got online!" or "<playerName> got offline!" when they get on/offline: done-ish
 4. ui/app thing and actual notifications on computer
-5. bug: last seen only works within the same day, whoops
+5. bug: last seen only works within the same day, whoops done
 6. bug: once the notifications start, they repeat every minute, but they change if the player goes offline
 7. bug: cannot quit once notifications are turned on
 Deadline: 8/12
@@ -116,17 +116,37 @@ public class PlayerLog3 {
                     java.util.TimeZone tz = java.util.TimeZone.getTimeZone("GMT");
                     java.util.Calendar c = java.util.Calendar.getInstance(tz);
 
-                    //converts to minutes
-                    int currentTimeInMin = c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(java.util.Calendar.MINUTE); //Battlemetrics time
-                    int logTimeInMin = cmdPlayer.lastSeen();
+                    String sneakyBullshit = cmdPlayer.lastSeen();
+                    if(!sneakyBullshit.equals("")) {
+                        int logMonth = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf("-") + 1, sneakyBullshit.indexOf("-") + 3));
+                        int logDay = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.lastIndexOf("-") + 1, sneakyBullshit.lastIndexOf("-") + 3));
+                        int logHour = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.lastIndexOf("T") + 1, sneakyBullshit.indexOf(":")));
+                        int logMinute = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.indexOf(":") + 1, sneakyBullshit.lastIndexOf(":")));
+                        int logSecond = Integer.parseInt(sneakyBullshit.substring(sneakyBullshit.lastIndexOf(":") + 1, sneakyBullshit.lastIndexOf(":") + 3));
 
-                    //subtracts logTimeInMin from currentTimeInMin to find out how long the player was last online if the time offline is > 0
-                    if (logTimeInMin > 0) {
-                        int timeOffline = currentTimeInMin - logTimeInMin;
-                        System.out.println(cmdPlayer.getName() + " got offline " + timeOffline / 60 + " hours and " + timeOffline % 60 + " minutes ago");
-                    //if time offline <= 0, player is online
+                        int currentMonth = c.get(Calendar.MONTH) + 1;
+                        int currentDay = c.get(Calendar.DAY_OF_MONTH);
+                        int currentHour = c.get(Calendar.HOUR_OF_DAY);
+                        int currentMinute = c.get(Calendar.MINUTE);
+                        int currentSecond = c.get(Calendar.SECOND);
+
+                        if (logMonth == currentMonth) {
+                            int logSec = logDay * 86400 + logHour * 3600 + logMinute * 60 + logSecond;
+                            int currentSec = currentDay * 86400 + currentHour * 3600 + currentMinute * 60 + currentSecond;
+                            int difference = currentSec - logSec;
+                            if (difference > 86400) {
+                                System.out.println(cmdPlayer.getName() + " logged out " + (difference / 86400) + " days " + ((difference % 86400) / 3600) + " hours " + (((difference % 86400) % 3600) / 60) + " minutes and " + (((difference % 86400) % 3600) % 60) +
+                                        " seconds ago");
+                            } else if (86400 > difference && difference > 3600) {
+                                System.out.println(cmdPlayer.getName() + " logged out " + (difference / 3600) + " hours " + ((difference % 3600) / 60) + " minutes and " + ((difference % 3600) % 60) + " seconds ago");
+                            } else if (3600 > difference && difference > 60) {
+                                System.out.println(cmdPlayer.getName() + " logged out " + (difference / 60) + " minutes and" + (difference % 60) + " seconds ago");
+                            } else {
+                                System.out.println(cmdPlayer.getName() + " logged out " + difference + " seconds ago");
+                            }
+                        }
                     } else {
-                        System.out.println("The player is currently online");
+                        System.out.println("Player has not logged on this month");
                     }
                 } else {
                     System.out.println("An error occurred. Make sure you spelled the name correctly");
