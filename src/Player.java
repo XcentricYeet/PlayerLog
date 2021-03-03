@@ -1,45 +1,95 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class Player {
-    //Variables
+public class Player3 {
     private String name;
+    private String link;
+    private boolean notificationsToggle;
 
-    //constructor
-    public Player(String name) {
+    public Player3(String name, String link, boolean notificationsToggle) {
         setName(name);
+        setLink(link);
+        setNotificationsToggle(notificationsToggle);
     }
 
-    //getters and setters
     public String getName() {
         return name;
     }
     public void setName(String name) {
         this.name = name;
     }
+    public String getLink() {
+        return link;
+    }
+    public void setLink(String link) {
+        this.link = link;
+    }
+    public boolean isNotificationsToggle() {
+        return notificationsToggle;
+    }
+    public void setNotificationsToggle(boolean notificationsToggle) {
+        this.notificationsToggle = notificationsToggle;
+    }
 
-    //returns true if player is online, returns false if they aren't
-    public boolean isOnline() throws FileNotFoundException {
-        File serverFile = new File("download.html");
-        Scanner reader = new Scanner(serverFile);
+    public boolean isOnline() throws IOException {
+        PlayerLog3.webPageDownloader(name, link);
+        File serverFile = new File(name + ".txt");
+        Scanner readr = new Scanner(serverFile);
         String serverList = "";
 
-        while(reader.hasNextLine()) {
-            String temp = reader.nextLine();
+        while(readr.hasNextLine()) {
+            String temp = readr.nextLine();
             temp = serverList + temp;
             serverList = temp;
         }
-        return serverList.contains(getName());
+        readr.close();
+        return !serverList.contains("Not online");
     }
 
-    //returns how long a player has been online in minutes, returns 0 if they are offline
-    public int timeOnline() {
-        return 0;
+    public String lastSeen() throws IOException { //only works within the day which is super cringe
+        PlayerLog3.webPageDownloader(name, link);
+        File serverFile = new File(name + ".txt");
+        Scanner readr = new Scanner(serverFile);
+        String serverList = "";
+
+        while(readr.hasNextLine()) {
+            String temp = readr.nextLine();
+            temp = serverList + temp;
+            serverList = temp;
+        }
+        readr.close();
+        if(serverList.contains("Last Seen</dt><dd><time dateTime=")) {
+            //gets time that the player logged off
+
+            //converts time into number of minutes
+            return serverList.substring(serverList.indexOf("Last Seen</dt><dd><time dateTime="), serverList.indexOf("title", serverList.indexOf("Last Seen</dt><dd><time dateTime=")));
+        } return "";
     }
 
-    //returns how long a player has been offline in minutes, returns 0 if they are online
-    public int timeOffline() {
-        return 0;
+    public void notifications() throws IOException {
+        boolean originalStatus = isOnline();
+        Runnable notifRunnable = new Runnable() {
+            public void run() {
+                try {
+                    if(originalStatus != isOnline()) {
+                        if(originalStatus) {
+                            System.out.println(name + " has gone offline!");
+                        } else {
+                            System.out.println(name + " has gone online!");
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+        exec.scheduleAtFixedRate(notifRunnable, 0, 1, TimeUnit.MINUTES);
     }
 }
