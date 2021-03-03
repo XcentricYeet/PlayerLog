@@ -6,12 +6,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Player3 {
+public class Player {
     private String name;
     private String link;
     private boolean notificationsToggle;
 
-    public Player3(String name, String link, boolean notificationsToggle) {
+    public Player(String name, String link, boolean notificationsToggle) {
         setName(name);
         setLink(link);
         setNotificationsToggle(notificationsToggle);
@@ -37,7 +37,7 @@ public class Player3 {
     }
 
     public boolean isOnline() throws IOException {
-        PlayerLog3.webPageDownloader(name, link);
+    	PlayerLog.webPageDownloader(name, link);
         File serverFile = new File(name + ".txt");
         Scanner readr = new Scanner(serverFile);
         String serverList = "";
@@ -52,7 +52,7 @@ public class Player3 {
     }
 
     public String lastSeen() throws IOException { //only works within the day which is super cringe
-        PlayerLog3.webPageDownloader(name, link);
+        PlayerLog.webPageDownloader(name, link);
         File serverFile = new File(name + ".txt");
         Scanner readr = new Scanner(serverFile);
         String serverList = "";
