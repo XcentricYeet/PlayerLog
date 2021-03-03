@@ -1,3 +1,17 @@
+/*
+current goals:
+1. fix unknown command bug: done, but my solution is quite stupid
+2. command to add players: done
+3. notifications: done-ish
+    - create boolean variable and have commands that turn on/off notifications for both specific players and every player: done
+    - have it check to see if a specific player is online or not every minute, and to say "<playerName> got online!" or "<playerName> got offline!" when they get on/offline: done-ish
+4. ui/app thing and actual notifications on computer
+5. bug: last seen only works within the same day, whoops done
+6. bug: once the notifications start, they repeat every minute, but they change if the player goes offline
+7. bug: cannot quit once notifications are turned on
+other possible things to add
+1. heli/cargo log would be cool, might only be possible on stevious tho, sadly. look into it
+ */
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
